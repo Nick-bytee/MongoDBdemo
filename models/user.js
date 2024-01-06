@@ -18,10 +18,28 @@ class User {
     // const cartProduct = this.cart.items.findIndex((cp) => {
     //   return cp._id === product._id;
     // });
-    const updatedCart = {
-      items: [{ productId: new mongodb.ObjectId(product._id), quantity: 1 }],
-    };
     const db = getdb();
+    console.log(this.cart);
+    const cartItemIndex = this.cart.items.findIndex((cp) => {
+      return cp.productId.toString() === product._id.toString();
+    });
+
+    let newQuantity = 1;
+    const updatedCartItems = [...this.cart.items];
+
+    if (cartItemIndex >= 0) {
+      newQuantity = this.cart.items[cartItemIndex].quantity + 1;
+      updatedCartItems[cartItemIndex].quantity = newQuantity;
+    } else {
+      updatedCartItems.push({
+        productId: new mongodb.ObjectId(product._id),
+        quantity: newQuantity,
+      });
+    }
+
+    const updatedCart = {
+      items: updatedCartItems,
+    };
     return db
       .collection("users")
       .updateOne(
