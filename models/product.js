@@ -19,7 +19,6 @@ class Product {
         .collection("products")
         .updateOne({ _id: this._id }, { $set: this });
     } else {
-      console.log("working");
       dbOp = db.collection("products").insertOne(this);
     }
     return dbOp
@@ -34,7 +33,6 @@ class Product {
       .find()
       .toArray()
       .then((products) => {
-        // console.log(products);
         return products;
       })
       .catch((err) => {
@@ -48,7 +46,6 @@ class Product {
       .collection("products")
       .findOne({ _id: new mongodb.ObjectId(prodId) })
       .then((product) => {
-        // console.log(product);
         return product;
       })
       .catch((err) => {
