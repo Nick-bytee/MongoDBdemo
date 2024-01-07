@@ -11,7 +11,7 @@ class User {
 
   add() {
     const db = getdb();
-    return db.collection("users").inserOne(this);
+    return db.collection("users").insertOne(this);
   }
 
   getCart() {
@@ -59,7 +59,7 @@ class User {
     return db
       .collection("users")
       .updateOne(
-        { _id: new ObjectId(this._id) },
+        { _id: new mongodb.ObjectId(this._id) },
         { $set: { cart: updatedCart } }
       );
   }
@@ -75,6 +75,38 @@ class User {
         { _id: new mongodb.ObjectId(this._id) },
         { $set: { cart: { items: updatedCartItems } } }
       );
+  }
+
+  addOrder() {
+    const db = getdb();
+    return this.getCart()
+      .then((products) => {
+        const order = {
+          items: products,
+          user: {
+            _id: new mongodb.ObjectId(this._id),
+            name: this.name,
+          },
+        };
+        return db.collection("orders").insertOne(order);
+      })
+      .then((result) => {
+        this.cart = { items: [] };
+        return db
+          .collection("users")
+          .updateOne(
+            { _id: new mongodb.ObjectId(this._id) },
+            { $set: { cart: { items: [] } } }
+          );
+      });
+  }
+
+  getOrders() {
+    const db = getdb();
+    return db
+      .collection("orders")
+      .find({ "user._id": new mongodb.ObjectId(this._id) })
+      .toArray();
   }
 
   static findById(userId) {
